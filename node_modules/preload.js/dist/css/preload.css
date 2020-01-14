@@ -1,0 +1,21 @@
+.loadelement_1{
+  position: fixed;
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
+  top: 0px;
+  background: #000;
+  z-index: 9999999999999;
+  opacity: 0.6;
+}
+
+.loadelement_2{
+  position:fixed;
+  top: 50%;
+  left: 50%;
+  width: 80px;
+  height: 80px;
+  margin-top: -40px; /*set to a negative number 1/2 of your height*/
+  margin-left: -40px; /*set to a negative number 1/2 of your width*/
+  z-index: 9999999999999;
+}

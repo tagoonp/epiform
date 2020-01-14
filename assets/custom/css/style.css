@@ -1,0 +1,40 @@
+body{ background: rgb(227, 227, 227); font-weight: 400 !important;}
+a{ text-decoration: none !important;}
+.dn {display: none; }
+.fs08{ font-size: 0.8em;}
+.bsdn{ box-shadow: none; }
+.bdn{ border:none !important;}
+th, .btn{ font-weight: 400 !important; }
+input[type=checkbox]
+{
+  /* Double-sized Checkboxes */
+  -ms-transform: scale(1.5); /* IE */
+  -moz-transform: scale(1.5); /* FF */
+  -webkit-transform: scale(1.5); /* Safari and Chrome */
+  -o-transform: scale(1.5); /* Opera */
+  transform: scale(1.5);
+  padding: 10px;
+}
+.bg-gray{ background: #3a414f; }
+
+/* 1.10 Dropzone */
+.dropzone {
+  border: 2px dashed #6777ef;
+  min-height: 240px;
+  text-align: center; }
+  .dropzone .dz-message {
+    font-size: 24px;
+    color: #34395e;
+    margin: 3.4em; }
+  .dropzone .dz-preview .dz-details {
+    padding: 2.2em 1em; }
+  .dropzone .dz-preview .dz-image {
+    border-radius: 3px; }
+
+@media (max-width: 575.98px) {
+  .dropzone .dz-message {
+    margin: 2em; } }
+
+@media (min-width: 576px) and (max-width: 767.98px) {
+  .dropzone .dz-message {
+    margin: 2.75em; } }
