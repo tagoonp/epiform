@@ -21,6 +21,7 @@ $uid = mysqli_real_escape_string($conn, $_GET['uid']);
   <link rel="stylesheet" href="../../node_modules/bootstrap-daterangepicker/daterangepicker.css">
   <link rel="stylesheet" href="../../node_modules/sweetalert/dist/sweetalert.css">
   <link rel="stylesheet" href="../../node_modules/preload.js/dist/css/preload.css">
+  <link rel="stylesheet" href="../../node_modules/datatables.net-bs4/css/dataTables.bootstrap4.min.css">
 
   <!-- CSS Libraries -->
 
@@ -150,31 +151,61 @@ $uid = mysqli_real_escape_string($conn, $_GET['uid']);
       <div class="main-content">
         <section class="section">
           <div class="section-header">
-            <h1>Create list</h1>
+            <h1>Project list</h1>
           </div>
 
           <div class="section-body">
-            <h6>Your project list</h6>
-            <div class="card">
-              <div class="card-body pt-5 pb-5">
-                <form class="createProjectForm" onsubmit"return false;">
-                  <div class="form-group">
-                    <label for="">Project title : <span class="text-danger">*</span> </label>
-                    <input type="text" class="form-control" >
-                  </div>
-
-                  <div class="form-group">
-                    <label for="">Project description : <span class="text-danger">*</span> </label>
-                    <textarea name="name" class="form-control" rows="8" cols="80"></textarea>
-                  </div>
-
-                  <div class="form-group text-right">
-                    <button type="button" name="button" class="btn btn-primary">Create</button>
-                  </div>
-
-                </form>
+            <?php
+            $strSQL = "SELECT * FROM de2x_project WHERE p_uid = '$uid' AND p_delete_status = 'N'";
+            $resultProject = mysqli_query($conn, $strSQL);
+            if(($resultProject) && (mysqli_num_rows($resultProject) > 0)){
+              ?>
+              <div class="row">
+                <div class="col-8">
+                  <h6>All your project created</h6>
+                </div>
+                <div class="col-4 text-right pb-2">
+                  <button type="button" name="button" class="btn btn-primary" id="btnCreateproject" style="margin-top: -10px;"><i class="fas fa-plus"></i> Create</button>
+                </div>
               </div>
-            </div>
+
+              <div class="card">
+                <div class="card-body">
+                  <table class="table table-striped" id="table-1">
+                    <thead>
+                      <tr>
+                        <th>#</th>
+                        <th>Title</th>
+                        <th>Create datetime</th>
+                        <th></th>
+                      </tr>
+                    </thead>
+                    <tbody id="table-1-data">
+                      <tr>
+                        <td colspan="4" class="text-center">No project found.</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <?php
+            }else{
+              ?>
+              <div class="card">
+                <div class="card-body pt-5 pb-5">
+                  <div class="row">
+                    <div class="col-8 offset-2 col-sm-4 offset-sm-4">
+                      <img src="../../img/branding.png" alt="" class="img-fluid">
+                    </div>
+                    <div class="col-12 text-center pt-3">
+                      <button type="button" class="btn btn-primary btn-lg" name="button" onclick="window.location = 'project-create?uid=<?php echo $uid; ?>'"><i class="fas fa-plus"></i> Click here to create your first project</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <?php
+            }
+            ?>
           </div>
         </section>
       </div>
@@ -198,6 +229,8 @@ $uid = mysqli_real_escape_string($conn, $_GET['uid']);
   <script type="text/javascript" src="../../node_modules/bootstrap-daterangepicker/daterangepicker.js"></script>
   <script type="text/javascript" src="../../node_modules/jquery.nicescroll/dist/jquery.nicescroll.min.js"></script>
   <script type="text/javascript" src="../../node_modules/preload.js/dist/js/preload.js"></script>
+  <script type="text/javascript" src="../../node_modules/datatables/media/js/jquery.dataTables.min.js"></script>
+  <script type="text/javascript" src="../../node_modules/datatables.net-bs4/js/dataTables.bootstrap4.min.js"></script>
   <script type="text/javascript" src="../../assets/js/stisla.js"></script>
 
   <!-- Core script -->
@@ -208,12 +241,14 @@ $uid = mysqli_real_escape_string($conn, $_GET['uid']);
 
   <script src="../../assets/custom/role/common.js"></script>
   <script src="../../assets/custom/js/epiform.1.0.1.js"></script>
+  <script src="../../assets/custom/js/epiform-project.1.0.1.js?token=<?php echo $sysdateu; ?>"></script>
 
-  <script src="../../assets/js/scripts.js"></script>
+  <!-- <script src="../../assets/js/scripts.js"></script> -->
 
   <script type="text/javascript">
     $(document).ready(function(){
-      authen.user('<?php echo $uid; ?>', 'user')
+      authen.user('<?php echo $uid; ?>')
+      project.list('<?php echo $uid; ?>', 'list')
     })
   </script>
 

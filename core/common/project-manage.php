@@ -3,11 +3,22 @@ include "../../config/conf.inc.php";
 include "../../config/connect.inc.php";
 include "../../config/function.inc.php";
 
-if(!isset($_GET['uid'])){
+if((!isset($_GET['uid'])) || (!isset($_GET['project']))){
     header('Location: ../');
     die();
 }
 $uid = mysqli_real_escape_string($conn, $_GET['uid']);
+$pid = mysqli_real_escape_string($conn, $_GET['project']);
+
+$strSQL = "SELECT * FROM de2x_project WHERE pid = '$pid' AND p_uid = '$uid' AND p_delete_status = 'N'";
+$resultProject = mysqli_query($conn, $strSQL);
+$dataProject = '';
+if(($resultProject) && (mysqli_num_rows($resultProject) > 0)){
+  $dataProject = mysqli_fetch_assoc($resultProject);
+}else{
+  echo "Invalid parameter";
+  mysqli_close($conn); die();
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -128,8 +139,9 @@ $uid = mysqli_real_escape_string($conn, $_GET['uid']);
               <li class="active" class="nav-item dropdown">
                 <a href="#" class="nav-link has-dropdown" data-toggle="dropdown"><i class="fas fa-columns"></i> <span>Project</span></a>
                 <ul class="dropdown-menu">
-                  <li class="active"><a class="nav-link" href="project-create?uid=<?php echo $uid; ?>">Create new project</a></li>
+                  <li><a class="nav-link" href="project-create?uid=<?php echo $uid; ?>">Create new project</a></li>
                   <li><a class="nav-link" href="project-list?uid=<?php echo $uid; ?>">Your project list</a></li>
+                  <li class="active"><a class="nav-link" href="project-manage?uid=<?php echo $uid; ?>&pid=<?php echo $pid;?>">Project management</a></li>
                 </ul>
               </li>
 
@@ -150,30 +162,48 @@ $uid = mysqli_real_escape_string($conn, $_GET['uid']);
       <div class="main-content">
         <section class="section">
           <div class="section-header">
-            <h1>Create new project</h1>
+            <h1>Project management</h1>
           </div>
 
           <div class="section-body">
-            <h6>Create project form</h6>
-            <div class="card">
-              <div class="card-body pt-5 pb-5">
-                <form class="createProjectForm" onsubmit="return false;">
-                  <div class="form-group">
-                    <label for="">Project title : <span class="text-danger">*</span> </label>
-                    <input type="text" class="form-control" id="txtTitle">
-                  </div>
+            <div class="row">
+              <div class="col-8">
+                <h6>All form</h6>
+              </div>
+              <div class="col-4 text-right pb-2">
+                <?php
+                $strSQL = "SELECT * FROM de2x_form WHERE form_pid = '$pid' ";
+                $resultForm = mysqli_query($conn, $strSQL);
+                if(($resultForm) && (mysqli_num_rows($resultForm) > 0)){
+                  ?>
+                  <button type="button" name="button" class="btn btn-primary" data-toggle="modal" data-target="#formModal" style="margin-top: -10px;"><i class="fas fa-plus"></i> Create new form</button>
+                  <?php
+                }
+                ?>
 
-                  <div class="form-group">
-                    <label for="">Project description :  </label>
-                    <textarea name="txtDesc" id="txtDesc" class="form-control" rows="8" cols="80"></textarea>
-                  </div>
-
-                  <div class="form-group text-right mb-0">
-                    <button type="submit" name="button" class="btn btn-primary">Create</button>
-                  </div>
-                </form>
               </div>
             </div>
+
+            <?php
+            if(($resultForm) && (mysqli_num_rows($resultForm) > 0)){
+
+            }else{
+              ?>
+              <div class="card">
+                <div class="card-body pt-5 pb-5">
+                  <div class="row">
+                    <div class="col-12 text-center">
+                      No questionaire form found.
+                    </div>
+                    <div class="col-12 text-center pt-3">
+                      <button type="button" class="btn btn-primary btn-lg" name="button"  data-toggle="modal" data-target="#formModal"><i class="fas fa-plus"></i> Click here to create first form</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <?php
+            }
+            ?>
           </div>
         </section>
       </div>
@@ -188,6 +218,41 @@ $uid = mysqli_real_escape_string($conn, $_GET['uid']);
     </div>
   </div>
 
+  <!-- Modal -->
+  <div class="modal fade" id="formModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Create form</h5>
+          <button type="button" class="close btnCloseModal" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form class="" onsubmit="return false;">
+            <div class="form-group">
+              <label for="">Project id : <span class="text-danger">*</span> </label>
+              <input type="text" class="form-control" id="txtFormprojectid" value="<?php echo $pid; ?>" readonly>
+            </div>
+            <div class="form-group">
+              <label for="">Form title : <span class="text-danger">*</span> </label>
+              <input type="text" class="form-control" id="txtFormtitle">
+            </div>
+            <div class="form-group">
+              <label for="">Description :</label>
+              <textarea name="txtFormdesc" id="txtFormdesc" rows="8" cols="80" class="form-control"></textarea>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" onclick="project.createForm()">Create</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- formModal -->
+
   <!-- General JS Scripts -->
   <script type="text/javascript" src="../../node_modules/jquery/dist/jquery.min.js" ></script>
   <script type="text/javascript" src="../../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
@@ -197,6 +262,7 @@ $uid = mysqli_real_escape_string($conn, $_GET['uid']);
   <script type="text/javascript" src="../../node_modules/bootstrap-daterangepicker/daterangepicker.js"></script>
   <script type="text/javascript" src="../../node_modules/jquery.nicescroll/dist/jquery.nicescroll.min.js"></script>
   <script type="text/javascript" src="../../node_modules/preload.js/dist/js/preload.js"></script>
+  <script type="text/javascript" src="../../node_modules/ckeditor_lite/ckeditor.js"></script>
   <script type="text/javascript" src="../../assets/js/stisla.js"></script>
 
   <!-- Core script -->
@@ -212,8 +278,22 @@ $uid = mysqli_real_escape_string($conn, $_GET['uid']);
   <script src="../../assets/js/scripts.js?token=<?php echo $sysdateu; ?>"></script>
 
   <script type="text/javascript">
+
+    var form_info = null;
+
     $(document).ready(function(){
       authen.user('<?php echo $uid; ?>', 'user')
+
+      if($("#txtFormdesc").length) {
+          form_info = CKEDITOR.replace( 'txtFormdesc', {
+              wordcount : {
+              showCharCount : false,
+              showWordCount : true,
+              },
+              height: '250px'
+          });
+      }
+
     })
   </script>
 
