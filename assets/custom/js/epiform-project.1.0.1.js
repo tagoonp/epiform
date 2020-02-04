@@ -11,6 +11,23 @@ var project = {
                  }
                })
   },
+  createForm(){
+    var param = {
+      pid: current_project,
+      uid: current_user,
+      desc: form_info.getData()
+    }
+    preload.show()
+    var jxr = $.post(conf.api + 'project?stage=create_form', param, function(){})
+               .always(function(resp){
+                 if(resp == 'Y'){
+                   window.location = 'project-list?uid=' + current_user
+                 }else{
+                   preload.hide()
+                   swal("Error!", "Operation fail", "error")
+                 }
+               })
+  },
   list(user, preload){
     // preload.show()
     var param = {

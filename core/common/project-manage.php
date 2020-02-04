@@ -230,7 +230,7 @@ if(($resultProject) && (mysqli_num_rows($resultProject) > 0)){
         </div>
         <div class="modal-body">
           <form class="" onsubmit="return false;">
-            <div class="form-group">
+            <div class="form-group dn">
               <label for="">Project id : <span class="text-danger">*</span> </label>
               <input type="text" class="form-control" id="txtFormprojectid" value="<?php echo $pid; ?>" readonly>
             </div>
