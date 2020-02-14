@@ -4,6 +4,7 @@ var project = {
     var jxr = $.post(conf.api + 'project?stage=create', param, function(){})
                .always(function(resp){
                  if(resp == 'Y'){
+                   $('#formModal').modal('hide')
                    window.location = 'project-list?uid=' + current_user
                  }else{
                    preload.hide()
@@ -11,17 +12,36 @@ var project = {
                  }
                })
   },
+  formList(){
+    var param = {
+      pid: current_project,
+      uid: current_user
+    }
+    preload.show()
+    var jxr = $.post(conf.api + 'project?stage=list_form', param, function(){}, 'json')
+              .always(function(snap){
+                if(fnc.json_exist(snap)){
+                  snap.forEach(i=>{
+
+                  })
+                  preload.hide()
+                }
+               })
+  },
   createForm(){
+    if($('#txtFormtitle').val() == ''){ $('#txtFormtitle').addClass('is-invalid'); return ;}else{ $('#txtFormtitle').removeClass('is-invalid'); }
     var param = {
       pid: current_project,
       uid: current_user,
+      form_title: $('#txtFormtitle').val(),
       desc: form_info.getData()
     }
     preload.show()
     var jxr = $.post(conf.api + 'project?stage=create_form', param, function(){})
                .always(function(resp){
                  if(resp == 'Y'){
-                   window.location = 'project-list?uid=' + current_user
+                   // project.formList()
+                   window.location.reload()
                  }else{
                    preload.hide()
                    swal("Error!", "Operation fail", "error")

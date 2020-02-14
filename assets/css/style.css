@@ -2256,7 +2256,7 @@ pre {
   border-radius: 0;
   border-top: 1px solid #f9f9f9;
   padding-left: 35px;
-  padding-right: 35px; 
+  padding-right: 35px;
 }
 
 @media (max-width: 575.98px) {
@@ -2820,3 +2820,6 @@ body:not(.sidebar-mini) .sidebar-style-2 .sidebar-menu li.active ul.dropdown-men
   100% {
     -webkit-transform: scale(1.2, 1.2);
     opacity: 0.0; } }
+
+.dn{ display: none; }
+.bsdn{ box-shadow: none; }

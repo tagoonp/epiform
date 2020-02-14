@@ -139,7 +139,6 @@ if(($resultProject) && (mysqli_num_rows($resultProject) > 0)){
               <li class="active" class="nav-item dropdown">
                 <a href="#" class="nav-link has-dropdown" data-toggle="dropdown"><i class="fas fa-columns"></i> <span>Project</span></a>
                 <ul class="dropdown-menu">
-                  <li><a class="nav-link" href="project-create?uid=<?php echo $uid; ?>">Create new project</a></li>
                   <li><a class="nav-link" href="project-list?uid=<?php echo $uid; ?>">Your project list</a></li>
                   <li class="active"><a class="nav-link" href="project-manage?uid=<?php echo $uid; ?>&pid=<?php echo $pid;?>">Project management</a></li>
                 </ul>
@@ -186,7 +185,27 @@ if(($resultProject) && (mysqli_num_rows($resultProject) > 0)){
 
             <?php
             if(($resultForm) && (mysqli_num_rows($resultForm) > 0)){
+              while($row = mysqli_fetch_array($resultForm)){
+                ?>
+                <div class="card">
+                  <div class="card-body">
+                    <div class="row">
+                      <div class="col-12">
+                        <h3><?php echo $row['form_title']; ?><a href="#" class="float-right"><i class="fas fa-pencil-alt"></i></a></h3>
+                        <h6><?php echo $row['form_desc']; ?></h6>
+                      </div>
+                    </div>
 
+                    <div class="row">
+                      <div class="col-12">
+                        <button type="button" name="button" class="btn btn-secondary text-dark bsdn" data-toggle="modal" data-target="#paramModal" onclick="setFormId('<?php echo $row['form_id']; ?>')"><i class="fas fa-plus"></i> เพิ่มข้อคำถาม</button>
+                        <button type="button" name="button" class="btn btn-danger btn-icon  bsdn"><i class="fas fa-trash"></i></button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <?php
+              }
             }else{
               ?>
               <div class="card">
@@ -253,6 +272,53 @@ if(($resultProject) && (mysqli_num_rows($resultProject) > 0)){
   </div>
   <!-- formModal -->
 
+  <!-- Modal -->
+  <div class="modal fade" id="paramModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Create variable</h5>
+          <button type="button" class="close btnCloseModal" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form class="" onsubmit="return false;">
+            <div class="form-group">
+              <label for="">Variable name : <span class="text-danger">*</span> </label>
+              <input type="text" class="form-control" id="txtFormtitle">
+            </div>
+            <div class="form-group">
+              <label for="">Question / Variable label :</label>
+              <textarea name="txtFormdesc" id="txtFormdesc" rows="8" cols="80" class="form-control"></textarea>
+            </div>
+            <div class="form-group">
+              <label for="">Answer length : </label>
+              <input type="number" min="1" max="255" class="form-control" id="txtFormtitle">
+              <small>Leave blank if answer my be as long text.</small>
+            </div>
+            <div class="form-group">
+              <label for="">Answer display type : </label>
+              <select class="form-control" name="">
+                <option value="">Text input</option>
+                <option value="">Paragraph</option>
+                <option value="">Signle choice</option>
+                <option value="">Multiple choice</option>
+                <option value="">Rating scale</option>
+              </select>
+              <small>This inout will show in tablet mode data entry.</small>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" onclick="project.createForm()">Create</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- formModal -->
+
   <!-- General JS Scripts -->
   <script type="text/javascript" src="../../node_modules/jquery/dist/jquery.min.js" ></script>
   <script type="text/javascript" src="../../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
@@ -280,6 +346,7 @@ if(($resultProject) && (mysqli_num_rows($resultProject) > 0)){
   <script type="text/javascript">
 
     var form_info = null;
+    var selected_form_id = null;
 
     $(document).ready(function(){
       authen.user('<?php echo $uid; ?>', 'user')
@@ -295,6 +362,10 @@ if(($resultProject) && (mysqli_num_rows($resultProject) > 0)){
       }
 
     })
+
+    function setFormId(id){
+      selected_form_id = id
+    }
   </script>
 
 </body>
