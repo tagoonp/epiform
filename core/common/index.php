@@ -131,6 +131,9 @@ $uid = mysqli_real_escape_string($conn, $_GET['uid']);
                 </ul>
               </li>
 
+              <li class="menu-header">Tools</li>
+              <li><a class="nav-link" href="credits?uid=<?php echo $uid; ?>"><i class="fas fa-project-diagram"></i> <span>Fxplor</span></a></li>
+
               <li class="menu-header">Documentation</li>
               <li class="nav-item dropdown">
                 <a href="#" class="nav-link has-dropdown"><i class="fas fa-book"></i> <span>How to?</span></a>

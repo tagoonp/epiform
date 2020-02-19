@@ -3,22 +3,11 @@ include "../../config/conf.inc.php";
 include "../../config/connect.inc.php";
 include "../../config/function.inc.php";
 
-if((!isset($_GET['uid'])) || (!isset($_GET['project']))){
+if(!isset($_GET['uid'])){
     header('Location: ../');
     die();
 }
 $uid = mysqli_real_escape_string($conn, $_GET['uid']);
-$pid = mysqli_real_escape_string($conn, $_GET['project']);
-
-$strSQL = "SELECT * FROM de2x_project WHERE pid = '$pid' AND p_uid = '$uid' AND p_delete_status = 'N'";
-$resultProject = mysqli_query($conn, $strSQL);
-$dataProject = '';
-if(($resultProject) && (mysqli_num_rows($resultProject) > 0)){
-  $dataProject = mysqli_fetch_assoc($resultProject);
-}else{
-  echo "Invalid parameter";
-  mysqli_close($conn); die();
-}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -136,16 +125,15 @@ if(($resultProject) && (mysqli_num_rows($resultProject) > 0)){
               <li class="menu-header">Dashboard</li>
               <li><a class="nav-link" href="./?uid=<?php echo $uid; ?>"><i class="fas fa-fire"></i> <span>Dashboard</span></a></li>
               <li class="menu-header">Starter</li>
-              <li class="active" class="nav-item dropdown">
+              <li class="nav-item dropdown">
                 <a href="#" class="nav-link has-dropdown" data-toggle="dropdown"><i class="fas fa-columns"></i> <span>Project</span></a>
                 <ul class="dropdown-menu">
                   <li><a class="nav-link" href="project-list?uid=<?php echo $uid; ?>">Your project list</a></li>
-                  <li class="active"><a class="nav-link" href="project-manage?uid=<?php echo $uid; ?>&pid=<?php echo $pid;?>">Project management</a></li>
                 </ul>
               </li>
 
               <li class="menu-header">Tools</li>
-              <li><a class="nav-link" href="fxplor-dashboard?uid=<?php echo $uid; ?>"><i class="fas fa-project-diagram"></i> <span>Fxplor</span></a></li>
+              <li class="active"><a class="nav-link" href="credits?uid=<?php echo $uid; ?>"><i class="fas fa-project-diagram"></i> <span>Fxplor</span></a></li>
 
               <li class="menu-header">Documentation</li>
               <li class="nav-item dropdown">
@@ -164,68 +152,36 @@ if(($resultProject) && (mysqli_num_rows($resultProject) > 0)){
       <div class="main-content">
         <section class="section">
           <div class="section-header">
-            <h1>Project management</h1>
+            <h1>Fxplor dashboard</h1>
           </div>
 
           <div class="section-body">
             <div class="row">
-              <div class="col-8">
-                <h6>All form</h6>
-              </div>
-              <div class="col-4 text-right pb-2">
-                <?php
-                $strSQL = "SELECT * FROM de2x_form WHERE form_pid = '$pid' ";
-                $resultForm = mysqli_query($conn, $strSQL);
-                if(($resultForm) && (mysqli_num_rows($resultForm) > 0)){
-                  ?>
-                  <button type="button" name="button" class="btn btn-primary" data-toggle="modal" data-target="#formModal" style="margin-top: -10px;"><i class="fas fa-plus"></i> Create new form</button>
-                  <?php
-                }
-                ?>
-
+              <div class="col-12 mb-3">
+                <button type="button" name="button" class="btn btn-primary"  data-toggle="modal" data-target="#connectionModal"><i class="fas fa-plus"></i> Create connection</button>
               </div>
             </div>
-
-            <?php
-            if(($resultForm) && (mysqli_num_rows($resultForm) > 0)){
-              while($row = mysqli_fetch_array($resultForm)){
-                ?>
-                <div class="card">
-                  <div class="card-body">
-                    <div class="row">
-                      <div class="col-12">
-                        <h3><?php echo $row['form_title']; ?><a href="#" class="float-right"><i class="fas fa-pencil-alt"></i></a></h3>
-                        <h6><?php echo $row['form_desc']; ?></h6>
-                      </div>
-                    </div>
-
-                    <div class="row">
-                      <div class="col-12">
-                        <button type="button" name="button" class="btn btn-secondary text-dark bsdn" data-toggle="modal" data-target="#paramModal" onclick="setFormId('<?php echo $row['form_id']; ?>')"><i class="fas fa-plus"></i> เพิ่มข้อคำถาม</button>
-                        <button type="button" name="button" class="btn btn-danger btn-icon  bsdn"><i class="fas fa-trash"></i></button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <?php
-              }
-            }else{
-              ?>
-              <div class="card">
-                <div class="card-body pt-5 pb-5">
-                  <div class="row">
-                    <div class="col-12 text-center">
-                      No questionaire form found.
-                    </div>
-                    <div class="col-12 text-center pt-3">
-                      <button type="button" class="btn btn-primary btn-lg" name="button"  data-toggle="modal" data-target="#formModal"><i class="fas fa-plus"></i> Click here to create first form</button>
-                    </div>
-                  </div>
-                </div>
+            <h6>Connections</h6>
+            <div class="card">
+              <div class="card-body p-0">
+                <table class="table table-striped mb-0" id="table-1">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Connetion title</th>
+                      <th>Type</th>
+                      <th>Status</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody id="table-1-data">
+                    <tr>
+                      <td colspan="5" class="text-center">No connection found.</td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
-              <?php
-            }
-            ?>
+            </div>
           </div>
         </section>
       </div>
@@ -240,88 +196,6 @@ if(($resultProject) && (mysqli_num_rows($resultProject) > 0)){
     </div>
   </div>
 
-  <!-- Modal -->
-  <div class="modal fade" id="formModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">Create form</h5>
-          <button type="button" class="close btnCloseModal" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <form class="" onsubmit="return false;">
-            <div class="form-group dn">
-              <label for="">Project id : <span class="text-danger">*</span> </label>
-              <input type="text" class="form-control" id="txtFormprojectid" value="<?php echo $pid; ?>" readonly>
-            </div>
-            <div class="form-group">
-              <label for="">Form title : <span class="text-danger">*</span> </label>
-              <input type="text" class="form-control" id="txtFormtitle">
-            </div>
-            <div class="form-group">
-              <label for="">Description :</label>
-              <textarea name="txtFormdesc" id="txtFormdesc" rows="8" cols="80" class="form-control"></textarea>
-            </div>
-          </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-          <button type="button" class="btn btn-primary" onclick="project.createForm()">Create</button>
-        </div>
-      </div>
-    </div>
-  </div>
-  <!-- formModal -->
-
-  <!-- Modal -->
-  <div class="modal fade" id="paramModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">Create variable</h5>
-          <button type="button" class="close btnCloseModal" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <form class="" onsubmit="return false;">
-            <div class="form-group">
-              <label for="">Variable name : <span class="text-danger">*</span> </label>
-              <input type="text" class="form-control" id="txtFormtitle">
-            </div>
-            <div class="form-group">
-              <label for="">Question / Variable label :</label>
-              <textarea name="txtFormdesc" id="txtFormdesc" rows="8" cols="80" class="form-control"></textarea>
-            </div>
-            <div class="form-group">
-              <label for="">Answer length : </label>
-              <input type="number" min="1" max="255" class="form-control" id="txtFormtitle">
-              <small>Leave blank if answer my be as long text.</small>
-            </div>
-            <div class="form-group">
-              <label for="">Answer display type : </label>
-              <select class="form-control" name="">
-                <option value="">Text input</option>
-                <option value="">Paragraph</option>
-                <option value="">Signle choice</option>
-                <option value="">Multiple choice</option>
-                <option value="">Rating scale</option>
-              </select>
-              <small>This inout will show in tablet mode data entry.</small>
-            </div>
-          </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-          <button type="button" class="btn btn-primary" onclick="project.createForm()">Create</button>
-        </div>
-      </div>
-    </div>
-  </div>
-  <!-- formModal -->
-
   <!-- General JS Scripts -->
   <script type="text/javascript" src="../../node_modules/jquery/dist/jquery.min.js" ></script>
   <script type="text/javascript" src="../../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
@@ -331,7 +205,6 @@ if(($resultProject) && (mysqli_num_rows($resultProject) > 0)){
   <script type="text/javascript" src="../../node_modules/bootstrap-daterangepicker/daterangepicker.js"></script>
   <script type="text/javascript" src="../../node_modules/jquery.nicescroll/dist/jquery.nicescroll.min.js"></script>
   <script type="text/javascript" src="../../node_modules/preload.js/dist/js/preload.js"></script>
-  <script type="text/javascript" src="../../node_modules/ckeditor_lite/ckeditor.js"></script>
   <script type="text/javascript" src="../../assets/js/stisla.js"></script>
 
   <!-- Core script -->
@@ -347,29 +220,65 @@ if(($resultProject) && (mysqli_num_rows($resultProject) > 0)){
   <script src="../../assets/js/scripts.js?token=<?php echo $sysdateu; ?>"></script>
 
   <script type="text/javascript">
-
-    var form_info = null;
-    var selected_form_id = null;
-
     $(document).ready(function(){
       authen.user('<?php echo $uid; ?>', 'user')
-
-      if($("#txtFormdesc").length) {
-          form_info = CKEDITOR.replace( 'txtFormdesc', {
-              wordcount : {
-              showCharCount : false,
-              showWordCount : true,
-              },
-              height: '250px'
-          });
-      }
-
     })
-
-    function setFormId(id){
-      selected_form_id = id
-    }
   </script>
 
 </body>
 </html>
+
+<!-- Modal -->
+<div class="modal fade" id="connectionModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Create new connection</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form onsubmit="return false;">
+          <div class="form-group">
+            <label for="">Connection type : <span class="text-danger">*</span> </label>
+            <select class="form-control" name="">
+              <option value="">-- Choose type --</option>
+              <option value="MySQL" selected>MySQL Database</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="">Host : <span class="text-danger">*</span> </label>
+            <input type="text" class="form-control" name="" value="">
+          </div>
+
+          <div class="form-group">
+            <label for="">Username : <span class="text-danger">*</span> </label>
+            <input type="text" class="form-control" name="" value="">
+          </div>
+
+          <div class="form-group">
+            <label for="">Password : <span class="text-danger">*</span> </label>
+            <input type="text" class="form-control" name="" value="">
+          </div>
+
+          <div class="form-group">
+            <label for="">Database name : <span class="text-danger">*</span> </label>
+            <input type="text" class="form-control" name="" value="">
+          </div>
+
+          <div class="form-group">
+            <label for="">View name : <span class="text-danger">*</span> </label>
+            <input type="text" class="form-control" name="" value="">
+          </div>
+
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
